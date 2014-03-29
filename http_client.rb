@@ -26,7 +26,12 @@ class HttpClient
   def setResult(resp)
     @body = resp.body
     @cookieArray = {}
-    resp.headers['Set-Cookie'].each { |s| /([\s\S]*?)=([\s\S]*?);/.match(s);@cookieArray.store($1,$2) }
+    if resp.headers['Set-Cookie'].class == Array
+      resp.headers['Set-Cookie'].each { |s| /([\s\S]*?)=([\s\S]*?);/.match(s);@cookieArray.store($1,$2) }
+    elsif resp.headers['Set-Cookie'].class == String
+      resp.headers['Set-Cookie'].each_line { |s| /([\s\S]*?)=([\s\S]*?);/.match(s);@cookieArray.store($1,$2);}
+    end
+
     @cookieString = ''
     @cookieArray.each_pair {|k,v| @cookieString = @cookieString + k+'='+v+';'}
   end

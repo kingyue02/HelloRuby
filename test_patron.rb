@@ -39,6 +39,38 @@ class TestPatron
       hao123 = /hao123Param=([\s\S]*?)&/.match(hc.body)[1]
     else
       puts 'needs to input verifycode'
+      codeString = /codeString=([\s\S]*?)&/.match(hc.body)[1]
+      hc.get('https://passport.baidu.com/cgi-bin/genimage?'+codeString)
+      f = File.open('/opt/jj.jpg','w')
+      f.puts hc.body
+      f.close
+      puts 'Please input the code'
+      code = gets
+      data = {
+          'apiver' => 'v3',
+          'callback' => 'parent.bd__pcbs__k2eobr',
+          'charset' => 'utf-8',
+          'codestring' => codeString,
+          'isPhone' => '',
+          'loginmerge' => 'true',
+          'logintype' => 'dialogLogin',
+          'logLoginType' => 'pc_loginDialog',
+          'mem_pass' => 'on',
+          'password' => pw,
+          'ppui_logintime' => '19682',
+          'quick_user' => '0',
+          'safeflg' => '0',
+          'splogin' => 'rate',
+          'staticpage' => 'http://www.baidu.com/cache/user/html/v3Jump.html',
+          'token' => token,
+          'tpl' => 'mn',
+          'tt' => Time.now.to_i.to_s,
+          'u' => 'http://www.baidu.com/',
+          'username' => un,
+          'verifycode' => code
+      }
+      hc.postWithCookie('https://passport.baidu.com/v2/api/?login', data, 'BAIDUID='+baiduID+';H_PS_PSSID='+hpss+';HOSUPPORT=1;UBI='+ubi)
+      puts hc.cookieString
     end
     #hc.getWithCookie("http://user.hao123.com/static/crossdomain.php?bdu=" + hao123 + "&t=" + Time.now.to_i.to_s,hc.cookieString)
     hc.cookieArray
@@ -47,5 +79,6 @@ end
 
 if __FILE__ == $0
   t = TestPatron.new
-  t.test1('gsh199449',gets).each { |k,v| puts k+'-------'+v}
+  #pw = gets
+  puts t.test1('gsh199449','').each { |k,v| puts k+'-------'+v}
 end
